@@ -10,7 +10,7 @@ def echo(bot, update):
 def main():
     updater = Updater(token)
     updater.start_webhook(listen='127.0.0.1', port=5000, url_path=token)
-    updater.bot.set_webhook(url='https://pigowl.com/' + token, certificate=open('fullchain.pem', 'rb'))
+    updater.bot.set_webhook(url='https://pigowl.com:443/' + token, certificate=open('fullchain.pem', 'rb'))
 
     dp = updater.dispatcher
 
