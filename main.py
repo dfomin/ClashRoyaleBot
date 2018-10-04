@@ -24,7 +24,7 @@ def load_clan_member(clan_tag):
     r = requests.get(url='https://api.clashroyale.com/v1/clans/' + clan_tag, params=params)
 
     result = {}
-    clan_info = json.loads(r.json())
+    clan_info = r.json()
     member_list = clan_info['memberList']
     for member in member_list:
         result[member['tag']] = member['name']
@@ -44,7 +44,7 @@ def load_clan_war_info(clan_tag):
 
     r = requests.get(url='https://api.clashroyale.com/v1/clans/' + clan_tag + '/warlog', params=params)
 
-    all_data = json.loads(r.json())
+    all_data = r.json()
 
     for item in all_data['items']:
         participants = item['participants']
@@ -84,11 +84,20 @@ def load_clan_war_info(clan_tag):
     return result
 
 
-def clan_war(bot, updater):
-    load_clan_member('%232UJ2GJ')
-    clan_war_info = load_clan_war_info()
+def clan_war(bot, update, args):
+    if len(args) != 1:
+        bot.send_message(update.message.chat.id, 'Invalid clan tag')
+        return
+
+    tag = args[0]
+    tag = tag.replace('#', '').upper()
+    
+    clan_war_info = load_clan_war_info('%23' + tag)
+    answer = ""
     for info in clan_war_info:
-        print(info)
+        answer += info + "\n"
+
+    bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
 def main():
@@ -98,7 +107,7 @@ def main():
 
     dp = updater.dispatcher
 
-    dp.add_handler(CommandHandler("clanwar", clan_war))
+    dp.add_handler(CommandHandler("clanwar", clan_war, pass_args=True))
 
     updater.idle()
 
