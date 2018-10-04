@@ -63,7 +63,7 @@ def load_clan_war_info(clan_tag):
             if participant is not None:
                 wins += participant['wins']
                 battles += participant['battlesPlayed']
-                plays += "1" if participant['wins'] > 0 else "0"
+                plays += "1" if participant['wins'] > 0 else "0" if participant['battlesPlayed'] > 0 else "_"
             else:
                 plays += "x"
 
