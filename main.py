@@ -1,10 +1,18 @@
 from telegram.ext import Updater, Filters, MessageHandler
+import requests
 
 token = ''
+royaleToken = ''
 
 
 def echo(bot, update):
-    update.message.reply_text(update.message.text)
+    params = dict(
+        authorization=royaleToken
+    )
+
+    r = requests.get(url='https://api.clashroyale.com/v1/clans/%232UJ2GJ/warlog', params=params)
+
+    update.message.reply_text(r.json())
 
 
 def main():
