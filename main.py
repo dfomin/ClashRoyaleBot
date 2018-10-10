@@ -6,16 +6,6 @@ token = ''
 royaleToken = ''
 
 
-def echo(bot, update):
-    params = dict(
-        authorization=royaleToken
-    )
-
-    r = requests.get(url='https://api.clashroyale.com/v1/clans/%232UJ2GJ/warlog', params=params)
-
-    update.message.reply_text(r.json())
-
-
 def load_clan_member(clan_tag):
     params = dict(
         authorization=royaleToken
@@ -84,6 +74,18 @@ def load_clan_war_info(clan_tag):
     return result
 
 
+def load_clan_war_standing(clan_tag):
+    params = dict(
+        authorization=royaleToken
+    )
+
+    r = requests.get(url='https://api.clashroyale.com/v1/clans/' + clan_tag + '/warlog', params=params)
+
+    all_data = r.json()
+
+    return all_data['standing']
+
+
 def clan_war(bot, update, args):
     if len(args) != 1:
         bot.send_message(update.message.chat.id, 'Invalid clan tag')
@@ -100,6 +102,19 @@ def clan_war(bot, update, args):
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
+def clan_stat(bot, update, args):
+    if len(args) != 1:
+        bot.send_message(update.message.chat.id, 'Invalid clan tag')
+        return
+
+    tag = args[0]
+    tag = tag.replace('#', '').upper()
+
+    standing = load_clan_war_standing(tag)
+    for clan in standing:
+        print(clan['clan']['name'])
+
+
 def main():
     updater = Updater(token)
     updater.start_webhook(listen='127.0.0.1', port=5000, url_path=token)
@@ -108,6 +123,7 @@ def main():
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("clanwar", clan_war, pass_args=True))
+    dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
 
     updater.idle()
 
