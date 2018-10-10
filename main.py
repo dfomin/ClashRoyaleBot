@@ -83,7 +83,12 @@ def load_clan_war_standing(clan_tag):
 
     all_data = r.json()
 
-    return all_data['standings']
+    result = []
+    for item in all_data['items']:
+        for index, standing in enumerate(item['standings']):
+            if clan_tag == standing['tag']:
+                result.append((index + 1, standing['wins'], standing['battlesPlayed'], standing['crowns'], standing['wins'] / standing['battlesPlayed']))
+    return result
 
 
 def clan_war(bot, update, args):
@@ -111,8 +116,8 @@ def clan_stat(bot, update, args):
     tag = tag.replace('#', '').upper()
 
     standings = load_clan_war_standing(tag)
-    for clan in standings:
-        print(clan['clan']['name'])
+    for standing in standings:
+        print(standing[0], standing[1], standing[2], standing[3], standing[4])
 
 
 def main():
