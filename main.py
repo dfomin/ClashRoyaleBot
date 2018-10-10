@@ -79,15 +79,16 @@ def load_clan_war_standing(clan_tag):
         authorization=royaleToken
     )
 
-    r = requests.get(url='https://api.clashroyale.com/v1/clans/' + clan_tag + '/warlog', params=params)
+    r = requests.get(url='https://api.clashroyale.com/v1/clans/%23' + clan_tag + '/warlog', params=params)
 
     all_data = r.json()
 
     result = []
     for item in all_data['items']:
         for index, standing in enumerate(item['standings']):
-            if clan_tag == standing['tag']:
-                result.append((index + 1, standing['wins'], standing['battlesPlayed'], standing['crowns'], standing['wins'] / standing['battlesPlayed']))
+            clan = standing['clan']
+            if '#' + clan_tag == clan['tag']:
+                result.append((index + 1, clan['wins'], clan['battlesPlayed'], clan['crowns'], clan['wins'] / clan['battlesPlayed']))
     return result
 
 
@@ -116,8 +117,15 @@ def clan_stat(bot, update, args):
     tag = tag.replace('#', '').upper()
 
     standings = load_clan_war_standing(tag)
+    battles = 0
+    wins = 0
+    answer = ""
     for standing in standings:
-        print(standing[0], standing[1], standing[2], standing[3], standing[4])
+        battles += standing[2]
+        wins += standing[1]
+        answer += str(standing[0]) + ' ' + str(round(100 * standing[4])) + '%\n'
+    answer += str(round(100 * wins / battles)) + '%'
+    bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
 def main():
