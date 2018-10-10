@@ -83,7 +83,7 @@ def load_clan_war_standing(clan_tag):
 
     all_data = r.json()
 
-    return all_data['standing']
+    return all_data['standings']
 
 
 def clan_war(bot, update, args):
@@ -110,8 +110,8 @@ def clan_stat(bot, update, args):
     tag = args[0]
     tag = tag.replace('#', '').upper()
 
-    standing = load_clan_war_standing(tag)
-    for clan in standing:
+    standings = load_clan_war_standing(tag)
+    for clan in standings:
         print(clan['clan']['name'])
 
 
