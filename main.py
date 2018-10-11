@@ -50,12 +50,18 @@ def load_clan_war_info(clan_tag):
         plays = ""
 
         for participant in participants:
+            if participant['battlesPlayed'] > 1:
+                plays += '*'
+
             if participant is not None:
                 wins += participant['wins']
                 battles += participant['battlesPlayed']
                 plays += "1" if participant['wins'] > 0 else "0" if participant['battlesPlayed'] > 0 else "_"
             else:
                 plays += "x"
+
+            if participant['battlesPlayed'] > 1:
+                plays += '*'
 
         if battles > 0:
             win_rate = wins / battles
@@ -92,6 +98,19 @@ def load_clan_war_standing(clan_tag):
     return result
 
 
+def get_stat(tag):
+    standings = load_clan_war_standing(tag)
+    battles = 0
+    wins = 0
+    answer = ""
+    for standing in standings:
+        battles += standing[2]
+        wins += standing[1]
+        answer += str(standing[0]) + ' ' + str(round(100 * standing[4])) + '%\n'
+    answer += str(round(100 * wins / battles)) + '%'
+    return answer
+
+
 def clan_war(bot, update, args):
     if len(args) != 1:
         bot.send_message(update.message.chat.id, 'Invalid clan tag')
@@ -115,16 +134,8 @@ def clan_stat(bot, update, args):
 
     tag = args[0]
     tag = tag.replace('#', '').upper()
+    answer = get_stat(tag)
 
-    standings = load_clan_war_standing(tag)
-    battles = 0
-    wins = 0
-    answer = ""
-    for standing in standings:
-        battles += standing[2]
-        wins += standing[1]
-        answer += str(standing[0]) + ' ' + str(round(100 * standing[4])) + '%\n'
-    answer += str(round(100 * wins / battles)) + '%'
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
