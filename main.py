@@ -50,8 +50,6 @@ def load_clan_war_info(clan_tag):
         plays = ""
 
         for participant in participants:
-            if participant['battlesPlayed'] > 1:
-                plays += '*'
 
             if participant is not None:
                 wins += participant['wins']
@@ -59,9 +57,6 @@ def load_clan_war_info(clan_tag):
                 plays += "1" if participant['wins'] > 0 else "0" if participant['battlesPlayed'] > 0 else "_"
             else:
                 plays += "x"
-
-            if participant['battlesPlayed'] > 1:
-                plays += '*'
 
         if battles > 0:
             win_rate = wins / battles
