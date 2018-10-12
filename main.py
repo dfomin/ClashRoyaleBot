@@ -1,6 +1,9 @@
 from telegram.ext import Updater, Filters, CommandHandler
 import requests
-import json
+import sys
+
+if sys.version_info[0] < 3:
+    raise Exception("Must be using Python 3")
 
 token = ''
 royaleToken = ''
@@ -11,7 +14,7 @@ def load_clan_member(clan_tag):
         authorization=royaleToken
     )
 
-    r = requests.get(url='https://api.clashroyale.com/v1/clans/' + clan_tag, params=params)
+    r = requests.get(url='https://api.clashroyale.com/v1/clans/%23' + clan_tag, params=params)
 
     result = {}
     clan_info = r.json()
@@ -32,11 +35,11 @@ def load_clan_war_info(clan_tag):
         authorization=royaleToken
     )
 
-    r = requests.get(url='https://api.clashroyale.com/v1/clans/' + clan_tag + '/warlog', params=params)
+    r = requests.get(url='https://api.clashroyale.com/v1/clans/%23' + clan_tag + '/warlog', params=params)
 
     all_data = r.json()
 
-    for item in all_data['items']:
+    for item in reversed(all_data['items']):
         participants = item['participants']
         for playerTag in clan_members.keys():
             participant = next((x for x in participants if x['tag'] == playerTag), None)
@@ -50,7 +53,6 @@ def load_clan_war_info(clan_tag):
         plays = ""
 
         for participant in participants:
-
             if participant is not None:
                 wins += participant['wins']
                 battles += participant['battlesPlayed']
@@ -61,8 +63,6 @@ def load_clan_war_info(clan_tag):
         if battles > 0:
             win_rate = wins / battles
         win_rate = int(100 * win_rate)
-
-        plays = plays[::-1]
 
         sorted_players.append((clan_members[tag], win_rate, plays, battles))
 
@@ -114,7 +114,7 @@ def clan_war(bot, update, args):
     tag = args[0]
     tag = tag.replace('#', '').upper()
     
-    clan_war_info = load_clan_war_info('%23' + tag)
+    clan_war_info = load_clan_war_info(tag)
     answer = ""
     for info in clan_war_info:
         answer += info + "\n"
@@ -146,6 +146,10 @@ def main():
 
     updater.idle()
 
+    # answer = load_clan_war_info('2UJ2GJ')
+    # print(answer)
+    # answer = get_stat('2UJ2GJ')
+    # print(answer)
 
 
 if __name__ == "__main__":
