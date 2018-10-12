@@ -44,17 +44,22 @@ def load_clan_war_info(clan_tag):
 
     sorted_players = []
     for tag, participants in clan_war_info.items():
-        wins = 0
-        battles = 0
+        wins = 0.0
+        battles = 0.0
         win_rate = 0
         plays = ""
 
         for participant in participants:
-
             if participant is not None:
                 wins += participant['wins']
                 battles += participant['battlesPlayed']
-                plays += "1" if participant['wins'] > 0 else "0" if participant['battlesPlayed'] > 0 else "_"
+                if participant['battlesPlayed'] < 2:
+                    plays += "1" if participant['wins'] > 0 else "0" if participant['battlesPlayed'] > 0 else "_"
+                else:
+                    plays += ")"
+                    for warBattle in range(participant['battlesPlayed']):
+                        plays += "1" if warBattle < participant['wins'] else "0"
+                    plays += "("
             else:
                 plays += "x"
 
