@@ -57,8 +57,8 @@ def load_clan_war_info(clan_tag):
                     plays += "1" if participant['wins'] > 0 else "0" if participant['battlesPlayed'] > 0 else "_"
                 else:
                     plays += ")"
-                    for warBattle in range(participant['battlesPlayed']):
-                        plays += "1" if warBattle < participant['wins'] else "0"
+                    for war_battle in range(participant['battlesPlayed']):
+                        plays += "1" if war_battle < participant['wins'] else "0"
                     plays += "("
             else:
                 plays += "x"
