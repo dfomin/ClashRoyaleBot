@@ -13,7 +13,7 @@ You can contribute here https://github.com/dfomin/ClashRoyaleBot.
 You can text me in telegram @dfomin'''
 
 
-def load_clan_member(clan_tag):
+def load_clan_members(clan_tag):
     params = dict(
         authorization=royaleToken
     )
@@ -29,9 +29,23 @@ def load_clan_member(clan_tag):
     return result
 
 
+def load_player_clan_war_win_rate(tag):
+    params = dict(
+        authorization=royaleToken
+    )
+
+    tag = tag.replace('#', '')
+    r = requests.get(url='https://api.clashroyale.com/v1/players/%23' + tag, params=params)
+
+    player_info = r.json()
+    wins = player_info['warDayWins']
+    cards = player_info['clanCardsCollected']
+    return player_info['name'] + ' ' + str(wins) + ' ' + str(round(cards / wins))
+
+
 def load_clan_war_info(clan_tag):
     clan_war_info = {}
-    clan_members = load_clan_member(clan_tag)
+    clan_members = load_clan_members(clan_tag)
     for tag in clan_members.keys():
         clan_war_info[tag] = []
 
@@ -116,13 +130,20 @@ def get_stat(tag):
     return answer
 
 
-def clan_war(bot, update, args):
+def get_tag(args):
     if len(args) != 1:
-        bot.send_message(update.message.chat.id, 'Invalid clan tag')
-        return
+        return None
 
     tag = args[0]
     tag = tag.replace('#', '').upper()
+    return tag
+
+
+def clan_war(bot, update, args):
+    tag = get_tag(args)
+    if tag is None:
+        bot.send_message(update.message.chat.id, 'Invalid clan tag')
+        return
     
     clan_war_info = load_clan_war_info(tag)
     answer = ""
@@ -133,13 +154,23 @@ def clan_war(bot, update, args):
 
 
 def clan_stat(bot, update, args):
-    if len(args) != 1:
+    tag = get_tag(args)
+    if tag is None:
         bot.send_message(update.message.chat.id, 'Invalid clan tag')
         return
 
-    tag = args[0]
-    tag = tag.replace('#', '').upper()
     answer = get_stat(tag)
+
+    bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
+
+
+def player_clan_war_stat(bot, update, args):
+    tag = get_tag(args)
+    if tag is None:
+        bot.send_message(update.message.chat.id, 'Invalid clan tag')
+        return
+
+    answer = load_player_clan_war_win_rate(tag)
 
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
@@ -168,12 +199,15 @@ def main():
     dp.add_handler(CommandHandler("about", about))
     dp.add_handler(CommandHandler("clanwar", clan_war, pass_args=True))
     dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
+    dp.add_handler(CommandHandler("playercwstat", player_clan_war_stat, pass_args=True))
 
     updater.idle()
 
     # answer = load_clan_war_info('2UJ2GJ')
     # print(answer)
     # answer = get_stat('2UJ2GJ')
+    # print(answer)
+    # answer = load_player_clan_war_win_rate('8RQVRJUC')
     # print(answer)
 
 
