@@ -140,6 +140,21 @@ def clan_stat(bot, update, args):
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
+def about(bot, update):
+    about_text = '''This is free open source telegram bot.
+    You can contribute here https://github.com/dfomin/ClashRoyaleBot.
+    You can text me in telegram @dfomin'''
+    bot.send_message(update.message.chat.id, about_text)
+
+
+def start(bot, update):
+    bot.send_message(update.message.chat.id, str(update.message.chat.id))
+
+
+def help(bot, update):
+    bot.send_message(update.message.chat.id, 'TBD')
+
+
 def main():
     updater = Updater(token)
     updater.start_webhook(listen='127.0.0.1', port=5000, url_path=token)
@@ -147,6 +162,9 @@ def main():
 
     dp = updater.dispatcher
 
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("about", about))
     dp.add_handler(CommandHandler("clanwar", clan_war, pass_args=True))
     dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
 
