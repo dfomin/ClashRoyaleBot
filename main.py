@@ -148,7 +148,7 @@ def about(bot, update):
 
 
 def start(bot, update):
-    bot.send_message(update.message.chat.id, str(update.message.chat.id))
+    bot.send_message(45227519, str(update.message.chat.id))
 
 
 def help(bot, update):
