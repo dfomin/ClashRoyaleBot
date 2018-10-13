@@ -8,6 +8,10 @@ if sys.version_info[0] < 3:
 token = ''
 royaleToken = ''
 
+about_text = '''This is free open source telegram bot for clash royale statistics.
+You can contribute here https://github.com/dfomin/ClashRoyaleBot.
+You can text me in telegram @dfomin'''
+
 
 def load_clan_member(clan_tag):
     params = dict(
@@ -141,9 +145,6 @@ def clan_stat(bot, update, args):
 
 
 def about(bot, update):
-    about_text = '''This is free open source telegram bot.
-    You can contribute here https://github.com/dfomin/ClashRoyaleBot.
-    You can text me in telegram @dfomin'''
     bot.send_message(update.message.chat.id, about_text)
 
 
