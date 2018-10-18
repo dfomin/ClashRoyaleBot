@@ -154,7 +154,7 @@ def load_win_streak_info(clan_tag):
     for player in sorted_players:
         if current_win_streak != player[1]:
             current_win_streak = player[1]
-            answer += str(current_win_streak) + '\n'
+            answer += '\n' + str(current_win_streak) + '\n'
         answer += clan_members[player[0]] + '\n'
     return answer
 
