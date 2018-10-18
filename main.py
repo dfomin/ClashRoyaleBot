@@ -59,9 +59,9 @@ def load_clan_war_info(clan_tag):
 
     for item in reversed(all_data['items']):
         participants = item['participants']
-        for playerTag in clan_members.keys():
-            participant = next((x for x in participants if x['tag'] == playerTag), None)
-            clan_war_info[playerTag].append(participant)
+        for player_tag in clan_members.keys():
+            participant = next((x for x in participants if x['tag'] == player_tag), None)
+            clan_war_info[player_tag].append(participant)
 
     sorted_players = []
     for tag, participants in clan_war_info.items():
@@ -117,6 +117,48 @@ def load_clan_war_standing(clan_tag):
     return result
 
 
+def load_win_streak_info(clan_tag):
+    clan_members = load_clan_members(clan_tag)
+    max_win_streak = dict.fromkeys(clan_members, 0)
+    current_win_streak = dict.fromkeys(clan_members, 0)
+
+    params = dict(
+        authorization=royaleToken
+    )
+
+    r = requests.get(url='https://api.clashroyale.com/v1/clans/%23' + clan_tag + '/warlog', params=params)
+
+    all_data = r.json()
+    for item in all_data['items']:
+        participants = item['participants']
+        for participant in participants:
+            player_tag = participant['tag']
+            if player_tag in clan_members:
+                current_win_streak[player_tag] += participant['wins']
+                if participant['wins'] < participant['battlesPlayed']:
+                    if max_win_streak[player_tag] < current_win_streak[player_tag]:
+                        max_win_streak[player_tag] = current_win_streak[player_tag]
+                    current_win_streak[player_tag] = participant['wins']
+
+    for player_tag in clan_members:
+        if max_win_streak[player_tag] < current_win_streak[player_tag]:
+            max_win_streak[player_tag] = current_win_streak[player_tag]
+
+    sorted_players = []
+    for player_tag in clan_members:
+        sorted_players.append((player_tag, max_win_streak[player_tag]))
+    sorted_players.sort(key=lambda x: x[1], reverse=True)
+
+    current_win_streak = sorted_players[0][1]
+    answer = str(current_win_streak) + '\n'
+    for player in sorted_players:
+        if current_win_streak != player[1]:
+            current_win_streak = player[1]
+            answer += str(current_win_streak) + '\n'
+        answer += clan_members[player[0]] + '\n'
+    return answer
+
+
 def get_stat(tag):
     standings = load_clan_war_standing(tag)
     battles = 0
@@ -164,6 +206,17 @@ def clan_stat(bot, update, args):
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
+def win_streak(bot, update, args):
+    tag = get_tag(args)
+    if tag is None:
+        bot.send_message(update.message.chat.id, 'Invalid clan tag')
+        return
+
+    answer = load_win_streak_info(tag)
+
+    bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
+
+
 def player_clan_war_stat(bot, update, args):
     tag = get_tag(args)
     if tag is None:
@@ -199,6 +252,7 @@ def main():
     dp.add_handler(CommandHandler("about", about))
     dp.add_handler(CommandHandler("clanwar", clan_war, pass_args=True))
     dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
+    dp.add_handler(CommandHandler("winstreak", win_streak, pass_args=True))
     dp.add_handler(CommandHandler("playercwstat", player_clan_war_stat, pass_args=True))
 
     updater.idle()
@@ -208,6 +262,8 @@ def main():
     # answer = get_stat('2UJ2GJ')
     # print(answer)
     # answer = load_player_clan_war_win_rate('8RQVRJUC')
+    # print(answer)
+    # answer = load_win_streak_info('2UJ2GJ')
     # print(answer)
 
 
