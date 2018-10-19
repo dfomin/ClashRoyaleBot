@@ -159,6 +159,42 @@ def load_win_streak_info(clan_tag):
     return answer
 
 
+def load_current_win_streak_info(clan_tag):
+    clan_members = load_clan_members(clan_tag)
+    current_win_streak = dict.fromkeys(clan_members, 0)
+    processed_members = []
+
+    params = dict(
+        authorization=royaleToken
+    )
+
+    r = requests.get(url='https://api.clashroyale.com/v1/clans/%23' + clan_tag + '/warlog', params=params)
+
+    all_data = r.json()
+    for item in all_data['items']:
+        participants = item['participants']
+        for participant in participants:
+            player_tag = participant['tag']
+            if player_tag in clan_members and player_tag not in processed_members:
+                current_win_streak[player_tag] += participant['wins']
+                if participant['wins'] < participant['battlesPlayed']:
+                    processed_members.append(player_tag)
+
+    sorted_players = []
+    for player_tag in clan_members:
+        sorted_players.append((player_tag, current_win_streak[player_tag]))
+    sorted_players.sort(key=lambda x: x[1], reverse=True)
+
+    win_streak = sorted_players[0][1]
+    answer = str(win_streak) + '\n'
+    for player in sorted_players:
+        if win_streak != player[1]:
+            win_streak = player[1]
+            answer += '\n' + str(win_streak) + '\n'
+        answer += clan_members[player[0]] + '\n'
+    return answer
+
+
 def get_stat(tag):
     standings = load_clan_war_standing(tag)
     battles = 0
@@ -206,13 +242,24 @@ def clan_stat(bot, update, args):
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
-def win_streak(bot, update, args):
+def max_win_streak(bot, update, args):
     tag = get_tag(args)
     if tag is None:
         bot.send_message(update.message.chat.id, 'Invalid clan tag')
         return
 
     answer = load_win_streak_info(tag)
+
+    bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
+
+
+def current_win_streak(bot, update, args):
+    tag = get_tag(args)
+    if tag is None:
+        bot.send_message(update.message.chat.id, 'Invalid clan tag')
+        return
+
+    answer = load_current_win_streak_info(tag)
 
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
@@ -252,7 +299,8 @@ def main():
     dp.add_handler(CommandHandler("about", about))
     dp.add_handler(CommandHandler("clanwar", clan_war, pass_args=True))
     dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
-    dp.add_handler(CommandHandler("winstreak", win_streak, pass_args=True))
+    dp.add_handler(CommandHandler("maxwinstreak", max_win_streak, pass_args=True))
+    dp.add_handler(CommandHandler("winstreak", current_win_streak, pass_args=True))
     dp.add_handler(CommandHandler("playercwstat", player_clan_war_stat, pass_args=True))
 
     updater.idle()
@@ -263,7 +311,7 @@ def main():
     # print(answer)
     # answer = load_player_clan_war_win_rate('8RQVRJUC')
     # print(answer)
-    # answer = load_win_streak_info('2UJ2GJ')
+    # answer = load_current_win_streak_info('2UJ2GJ')
     # print(answer)
 
 
