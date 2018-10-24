@@ -99,6 +99,41 @@ def load_clan_war_info(clan_tag):
     return result
 
 
+def load_card_collection_info(clan_tag):
+    card_collection_info = {}
+    clan_members = load_clan_members(clan_tag)
+    for tag in clan_members.keys():
+        card_collection_info[tag] = []
+
+    params = dict(
+        authorization=royaleToken
+    )
+
+    r = requests.get(url='https://api.clashroyale.com/v1/clans/%23' + clan_tag + '/warlog', params=params)
+
+    all_data = r.json()
+
+    for item in reversed(all_data['items']):
+        participants = item['participants']
+        for player_tag in clan_members.keys():
+            participant = next((x for x in participants if x['tag'] == player_tag), None)
+            if participant is not None:
+                card_collection_info[player_tag].append(participant['collectionDayBattlesPlayed'])
+            else:
+                card_collection_info[player_tag].append(0)
+
+    answer = ""
+    for tag, info in card_collection_info.items():
+        for battles in info:
+            if battles != 3 and battles != 0:
+                answer += clan_members[tag] + ' '
+                for battlesCount in info:
+                    answer += str(battlesCount)
+                answer += '\n'
+                break
+
+    return answer
+
 def load_clan_war_standing(clan_tag):
     params = dict(
         authorization=royaleToken
@@ -264,6 +299,19 @@ def current_win_streak(bot, update, args):
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
+def card_collection(bot, update, args):
+    tag = get_tag(args)
+    if tag is None:
+        bot.send_message(update.message.chat.id, 'Invalid clan tag')
+        return
+
+    answer = load_card_collection_info(tag)
+    if len(answer) == 0:
+        answer = "No one skips collection day."
+
+    bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
+
+
 def player_clan_war_stat(bot, update, args):
     tag = get_tag(args)
     if tag is None:
@@ -301,6 +349,7 @@ def main():
     dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
     dp.add_handler(CommandHandler("maxwinstreak", max_win_streak, pass_args=True))
     dp.add_handler(CommandHandler("winstreak", current_win_streak, pass_args=True))
+    dp.add_handler(CommandHandler("collectiondayskip", card_collection, pass_args=True))
     dp.add_handler(CommandHandler("playercwstat", player_clan_war_stat, pass_args=True))
 
     updater.idle()
@@ -312,6 +361,8 @@ def main():
     # answer = load_player_clan_war_win_rate('8RQVRJUC')
     # print(answer)
     # answer = load_current_win_streak_info('2UJ2GJ')
+    # print(answer)
+    # answer = load_card_collection_info('2UJ2GJ')
     # print(answer)
 
 
