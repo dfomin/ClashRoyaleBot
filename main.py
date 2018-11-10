@@ -58,8 +58,8 @@ def load_clan_war_info(clan_tag, skip_as_lose, last_season):
     all_data = r.json()
 
     last_season_id = -1
-    if last_season:
-        last_season_id = all_data['items']['seasonId']
+    if last_season and len(all_data['items']) > 0:
+        last_season_id = all_data['items'][0]['seasonId']
 
     for item in reversed(all_data['items']):
         if last_season and item['seasonId'] != last_season_id:
@@ -399,7 +399,7 @@ def main():
 
     updater.idle()
 
-    # answer = load_clan_war_info('2UJ2GJ')
+    # answer = load_clan_war_info('2UJ2GJ', False, False)
     # print(answer)
     # answer = get_stat('2UJ2GJ')
     # print(answer)
@@ -408,6 +408,8 @@ def main():
     # answer = load_current_win_streak_info('2UJ2GJ')
     # print(answer)
     # answer = load_card_collection_info('2UJ2GJ')
+    # print(answer)
+    # answer = load_clan_war_info('2UJ2GJ', True, True)
     # print(answer)
 
 
