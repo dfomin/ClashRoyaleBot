@@ -43,7 +43,7 @@ def load_player_clan_war_win_rate(tag):
     return player_info['name'] + ' ' + str(wins) + ' ' + str(round(cards / wins))
 
 
-def load_clan_war_info(clan_tag, skip_as_lose):
+def load_clan_war_info(clan_tag, skip_as_lose, last_season):
     clan_war_info = {}
     clan_members = load_clan_members(clan_tag)
     for tag in clan_members.keys():
@@ -57,7 +57,14 @@ def load_clan_war_info(clan_tag, skip_as_lose):
 
     all_data = r.json()
 
+    last_season_id = -1
+    if last_season:
+        last_season_id = all_data['items']['seasonId']
+
     for item in reversed(all_data['items']):
+        if last_season and item['seasonId'] != last_season_id:
+            continue
+
         participants = item['participants']
         for player_tag in clan_members.keys():
             participant = next((x for x in participants if x['tag'] == player_tag), None)
@@ -140,6 +147,7 @@ def load_card_collection_info(clan_tag):
                 break
 
     return answer
+
 
 def load_clan_war_standing(clan_tag):
     params = dict(
@@ -265,7 +273,7 @@ def clan_war(bot, update, args):
         bot.send_message(update.message.chat.id, 'Invalid clan tag')
         return
     
-    clan_war_info = load_clan_war_info(tag, False)
+    clan_war_info = load_clan_war_info(tag, False, False)
     answer = ""
     for info in clan_war_info:
         answer += info + "\n"
@@ -279,7 +287,21 @@ def clan_war_ece(bot, update, args):
         bot.send_message(update.message.chat.id, 'Invalid clan tag')
         return
 
-    clan_war_info = load_clan_war_info(tag, True)
+    clan_war_info = load_clan_war_info(tag, True, False)
+    answer = ""
+    for info in clan_war_info:
+        answer += info + "\n"
+
+    bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
+
+
+def clan_war_ece_last_season(bot, update, args):
+    tag = get_tag(args)
+    if tag is None:
+        bot.send_message(update.message.chat.id, 'Invalid clan tag')
+        return
+
+    clan_war_info = load_clan_war_info(tag, True, True)
     answer = ""
     for info in clan_war_info:
         answer += info + "\n"
@@ -368,6 +390,7 @@ def main():
     dp.add_handler(CommandHandler("about", about))
     dp.add_handler(CommandHandler("clanwar", clan_war, pass_args=True))
     dp.add_handler(CommandHandler("clanwarece", clan_war_ece, pass_args=True))
+    dp.add_handler(CommandHandler("clanwarecelastseason", clan_war_ece_last_season, pass_args=True))
     dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
     dp.add_handler(CommandHandler("maxwinstreak", max_win_streak, pass_args=True))
     dp.add_handler(CommandHandler("winstreak", current_win_streak, pass_args=True))
