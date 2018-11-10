@@ -75,6 +75,9 @@ def load_clan_war_info(clan_tag, skip_as_lose):
                 wins += participant['wins']
                 battles += participant['battlesPlayed']
 
+                if participant['battlesPlayed'] == 0 and skip_as_lose:
+                    battles += 1
+
                 if participant['battlesPlayed'] < 2:
                     plays += "1" if participant['wins'] > 0 else "0" if participant['battlesPlayed'] > 0 else "_"
                 else:
