@@ -43,7 +43,7 @@ def load_player_clan_war_win_rate(tag):
     return player_info['name'] + ' ' + str(wins) + ' ' + str(round(cards / wins))
 
 
-def load_clan_war_info(clan_tag):
+def load_clan_war_info(clan_tag, skip_as_lose):
     clan_war_info = {}
     clan_members = load_clan_members(clan_tag)
     for tag in clan_members.keys():
@@ -74,6 +74,7 @@ def load_clan_war_info(clan_tag):
             if participant is not None:
                 wins += participant['wins']
                 battles += participant['battlesPlayed']
+
                 if participant['battlesPlayed'] < 2:
                     plays += "1" if participant['wins'] > 0 else "0" if participant['battlesPlayed'] > 0 else "_"
                 else:
@@ -83,6 +84,9 @@ def load_clan_war_info(clan_tag):
                     plays += ")"
             else:
                 plays += "x"
+
+                if skip_as_lose:
+                    battles += 1
 
         if battles > 0:
             win_rate = wins / battles
@@ -258,7 +262,21 @@ def clan_war(bot, update, args):
         bot.send_message(update.message.chat.id, 'Invalid clan tag')
         return
     
-    clan_war_info = load_clan_war_info(tag)
+    clan_war_info = load_clan_war_info(tag, False)
+    answer = ""
+    for info in clan_war_info:
+        answer += info + "\n"
+
+    bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
+
+
+def clan_war_ece(bot, update, args):
+    tag = get_tag(args)
+    if tag is None:
+        bot.send_message(update.message.chat.id, 'Invalid clan tag')
+        return
+
+    clan_war_info = load_clan_war_info(tag, True)
     answer = ""
     for info in clan_war_info:
         answer += info + "\n"
@@ -346,6 +364,7 @@ def main():
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("about", about))
     dp.add_handler(CommandHandler("clanwar", clan_war, pass_args=True))
+    dp.add_handler(CommandHandler("clanwarece", clan_war_ece, pass_args=True))
     dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
     dp.add_handler(CommandHandler("maxwinstreak", max_win_streak, pass_args=True))
     dp.add_handler(CommandHandler("winstreak", current_win_streak, pass_args=True))
