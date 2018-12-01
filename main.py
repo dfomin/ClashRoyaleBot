@@ -12,6 +12,34 @@ about_text = '''This is free open source telegram bot for clash royale statistic
 You can contribute here https://github.com/dfomin/ClashRoyaleBot.
 You can text me in telegram @dfomin'''
 
+help_text = '''
+'''
+
+help_text_ru = '''Бот выводит статистику всех игроков клана по 10 последним клановым войнам.
+Получить статистику больше, чем по 10 кв нельзя, так как supercell хранит только 10 последних.
+
+/clanwar <тэг клана> (например, '/clanwar 2UJ2GJ') выводит список игроков в виде:
+<ник игрока> <процент побед в 10 последних кв> <результат для каждой кв>
+Результат отображается так:
+x - игрок не участвовал
+_ - игрок сыграл первый день и не провел финальную атаку
+0 - игрок проиграл финальный бой
+1 - игрок выиграл финальный бой
+(00) или (01) или (11) - игрок имел 2 боя, в скобочках написаны результаты этих боёв.
+Эта команда имеет несколько разновидностей:
+/clanwarece - выводит ту же информацию что и clanwar, но в подсчёте процента побед пропуск войны равносилен поражению в финальной битве.
+/clanwarecelastseason - то же самое, что и clanwarece, но учитывает только войны в последнем сезоне (их может быть от 1 до 7).
+
+/clanstat <тэг клана> (например, '/clanstat 2UJ2GJ') выводит статистику клана за 10 последних кв (удобно для оценки уровня клана соперника):
+<место которое занял клан> <процент побед в финальной битве в этой войне>
+
+/winstreak <тэг клана> (например, '/winstreak 2UJ2GJ') выводит игроков, отсортированных по текущему количеству побед подряд в 10 последних кв.
+/maxwinstreak <тэг клана> (например, '/maxwinstreak 2UJ2GJ') выводит игроков, отсортированных по максимальному количеству побед подряд в 10 последних кв.
+
+/collectiondayskip <тэг клана> (например, '/collectiondayskip 2UJ2GJ') выводит игроков которые не доигрывали день сбора в 10 последних кв:
+<ник игрока> <количество боев в день сбора>, 0 - пропуск кв, 3 - сыграл все бои, 1 или 2 - не доиграл день сбора.
+'''
+
 
 def load_clan_members(clan_tag):
     params = dict(
@@ -372,10 +400,15 @@ def about(bot, update):
 
 def start(bot, update):
     bot.send_message(45227519, str(update.message.chat.id))
+    bot.send_message(update.message.chat.id, 'Hello, try /help or /help_ru')
 
 
 def help(bot, update):
     bot.send_message(update.message.chat.id, 'TBD')
+
+
+def help_ru(bot, update):
+    bot.send_message(update.message.chat.id, help_text_ru)
 
 
 def main():
@@ -387,6 +420,7 @@ def main():
 
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("help_ru", help_ru))
     dp.add_handler(CommandHandler("about", about))
     dp.add_handler(CommandHandler("clanwar", clan_war, pass_args=True))
     dp.add_handler(CommandHandler("clanwarece", clan_war_ece, pass_args=True))
