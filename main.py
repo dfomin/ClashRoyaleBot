@@ -12,7 +12,31 @@ about_text = '''This is free open source telegram bot for clash royale statistic
 You can contribute here https://github.com/dfomin/ClashRoyaleBot.
 You can text me in telegram @dfomin'''
 
-help_text = '''
+help_text = '''Bot shows statistics of the last 10 clan wars for all clan members.
+It's impossible to get information more than 10 clan wars because supercell stores only 10 last.
+
+/clanwar <clan tag> ('/clanwar 2UJ2GJ') shows clan members:
+<player nick> <percentage of wins (final battle) in last 10 clan wars> <result for each clan war battle>
+Result is shown as:
+x - player didn't participate in the clan war
+_ - player participated in collection day but skipped final battle
+0 - player lost final battle
+1 - player won final battle
+(00) or (01) or (11) - player had 2 battles, 2 results for each battle.
+This command has a few variations:
+/clanwarece - the same as clanwar, but the skip of final battle is considered as defeat.
+/clanwarecelastseason - the same as clanwarece, but only clan wars in the current season counts (it could be from 1 to 7).
+
+/skips <clan tag> ('/skips 2UJ2GJ') shows statistics about missed battles in collection day and final battle of the last 10 clan wars.
+
+/clanstat <clan tag> ('/clanstat 2UJ2GJ') shows results of the clan for last 10 clan wars (useful to estimate averate skill of the clan):
+<result place in clan war> <percentage of wins in the clan war>
+
+/winstreak <clan tag> ('/winstreak 2UJ2GJ') shows clan members sorted by current win streak in the last 10 clan wars.
+/maxwinstreak <clan tag> ('/maxwinstreak 2UJ2GJ') shows clan members sorted by max win streak in the last 10 clan wars.
+
+/collectiondayskip <clan tag> ('/collectiondayskip 2UJ2GJ') shows players who participated but didn't play all games in collection day in the last 10 clan wars:
+<player nick> <amount of collection day battles>, 0 - didn't participate, 3 - played all battles, 1 or 2 - didn't play all battles.
 '''
 
 help_text_ru = '''Бот выводит статистику всех игроков клана по 10 последним клановым войнам.
@@ -29,6 +53,8 @@ _ - игрок сыграл первый день и не провел фина�
 Эта команда имеет несколько разновидностей:
 /clanwarece - выводит ту же информацию что и clanwar, но в подсчёте процента побед пропуск войны равносилен поражению в финальной битве.
 /clanwarecelastseason - то же самое, что и clanwarece, но учитывает только войны в последнем сезоне (их может быть от 1 до 7).
+
+/skips <тэг клана> (например, '/skips 2UJ2GJ') выводит статистику по пропуску дней сбора и финальных битв за последние 10 кв.
 
 /clanstat <тэг клана> (например, '/clanstat 2UJ2GJ') выводит статистику клана за 10 последних кв (удобно для оценки уровня клана соперника):
 <место которое занял клан> <процент побед в финальной битве в этой войне>
@@ -57,6 +83,40 @@ def load_clan_members(clan_tag):
     return result
 
 
+def load_clan_war_skips_info(clan_tag):
+    clan_war_info = {}
+    clan_members = load_clan_members(clan_tag)
+    for tag in clan_members.keys():
+        clan_war_info[tag] = []
+
+    params = dict(
+        authorization=royaleToken
+    )
+
+    r = requests.get(url='https://api.clashroyale.com/v1/clans/%23' + clan_tag + '/warlog', params=params)
+
+    all_data = r.json()
+
+    result = ""
+    for item in reversed(all_data['items']):
+        result += 'day 1: '
+        participants = item['participants']
+        line = []
+        for participant in participants:
+            if participant['tag'] in clan_members:
+                if participant['collectionDayBattlesPlayed'] == 1 or participant['collectionDayBattlesPlayed'] == 2:
+                    line.append(clan_members[participant['tag']] + '(' + str(participant['collectionDayBattlesPlayed']) + '/3)')
+        result += ", ".join(line) + '\n'
+        result += 'day 2: '
+        line = []
+        for participant in participants:
+            if participant['tag'] in clan_members:
+                if participant['battlesPlayed'] == 0:
+                    line.append(clan_members[participant['tag']])
+        result += ", ".join(line) + '\n'
+    return result
+
+
 def load_player_clan_war_win_rate(tag):
     params = dict(
         authorization=royaleToken
@@ -71,7 +131,7 @@ def load_player_clan_war_win_rate(tag):
     return player_info['name'] + ' ' + str(wins) + ' ' + str(round(cards / wins))
 
 
-def load_clan_war_info(clan_tag, skip_as_lose, last_season):
+def load_clan_war_info_raw(clan_tag, skip_as_lose, last_season):
     clan_war_info = {}
     clan_members = load_clan_members(clan_tag)
     for tag in clan_members.keys():
@@ -97,7 +157,11 @@ def load_clan_war_info(clan_tag, skip_as_lose, last_season):
         for player_tag in clan_members.keys():
             participant = next((x for x in participants if x['tag'] == player_tag), None)
             clan_war_info[player_tag].append(participant)
+    return clan_war_info
 
+
+def load_clan_war_info(clan_tag, skip_as_lose, last_season):
+    clan_war_info = load_clan_war_info_raw(clan_tag, skip_as_lose, last_season)
     sorted_players = []
     for tag, participants in clan_war_info.items():
         wins = 0
@@ -141,7 +205,7 @@ def load_clan_war_info(clan_tag, skip_as_lose, last_season):
     return result
 
 
-def load_card_collection_info(clan_tag):
+def load_card_collection_info_raw(clan_tag):
     card_collection_info = {}
     clan_members = load_clan_members(clan_tag)
     for tag in clan_members.keys():
@@ -163,6 +227,12 @@ def load_card_collection_info(clan_tag):
                 card_collection_info[player_tag].append(participant['collectionDayBattlesPlayed'])
             else:
                 card_collection_info[player_tag].append(0)
+    return card_collection_info
+
+
+def load_card_collection_info(clan_tag):
+    clan_members = load_clan_members(clan_tag)
+    card_collection_info = load_card_collection_info_raw(clan_tag)
 
     answer = ""
     for tag, info in card_collection_info.items():
@@ -337,6 +407,17 @@ def clan_war_ece_last_season(bot, update, args):
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
+def clan_skips(bot, update, args):
+    tag = get_tag(args)
+    if tag is None:
+        bot.send_message(update.message.chat.id, 'Invalid clan tag')
+        return
+
+    answer = load_clan_war_skips_info(tag)
+
+    bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
+
+
 def clan_stat(bot, update, args):
     tag = get_tag(args)
     if tag is None:
@@ -412,26 +493,27 @@ def help_ru(bot, update):
 
 
 def main():
-    updater = Updater(token)
-    updater.start_webhook(listen='127.0.0.1', port=5000, url_path=token)
-    updater.bot.set_webhook(url='https://pigowl.com:443/' + token)
-
-    dp = updater.dispatcher
-
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
-    dp.add_handler(CommandHandler("help_ru", help_ru))
-    dp.add_handler(CommandHandler("about", about))
-    dp.add_handler(CommandHandler("clanwar", clan_war, pass_args=True))
-    dp.add_handler(CommandHandler("clanwarece", clan_war_ece, pass_args=True))
-    dp.add_handler(CommandHandler("clanwarecelastseason", clan_war_ece_last_season, pass_args=True))
-    dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
-    dp.add_handler(CommandHandler("maxwinstreak", max_win_streak, pass_args=True))
-    dp.add_handler(CommandHandler("winstreak", current_win_streak, pass_args=True))
-    dp.add_handler(CommandHandler("collectiondayskip", card_collection, pass_args=True))
-    dp.add_handler(CommandHandler("playercwstat", player_clan_war_stat, pass_args=True))
-
-    updater.idle()
+    # updater = Updater(token)
+    # updater.start_webhook(listen='127.0.0.1', port=5000, url_path=token)
+    # updater.bot.set_webhook(url='https://pigowl.com:443/' + token)
+    #
+    # dp = updater.dispatcher
+    #
+    # dp.add_handler(CommandHandler("start", start))
+    # dp.add_handler(CommandHandler("help", help))
+    # dp.add_handler(CommandHandler("help_ru", help_ru))
+    # dp.add_handler(CommandHandler("about", about))
+    # dp.add_handler(CommandHandler("clanwar", clan_war, pass_args=True))
+    # dp.add_handler(CommandHandler("clanwarece", clan_war_ece, pass_args=True))
+    # dp.add_handler(CommandHandler("clanwarecelastseason", clan_war_ece_last_season, pass_args=True))
+    # dp.add_handler(CommandHandler("skips", clan_skips, pass_args=True))
+    # dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
+    # dp.add_handler(CommandHandler("maxwinstreak", max_win_streak, pass_args=True))
+    # dp.add_handler(CommandHandler("winstreak", current_win_streak, pass_args=True))
+    # dp.add_handler(CommandHandler("collectiondayskip", card_collection, pass_args=True))
+    # dp.add_handler(CommandHandler("playercwstat", player_clan_war_stat, pass_args=True))
+    #
+    # updater.idle()
 
     # answer = load_clan_war_info('2UJ2GJ', False, False)
     # print(answer)
@@ -445,6 +527,8 @@ def main():
     # print(answer)
     # answer = load_clan_war_info('2UJ2GJ', True, True)
     # print(answer)
+    answer = load_clan_war_skips_info('2UJ2GJ')
+    print(answer)
 
 
 if __name__ == "__main__":
