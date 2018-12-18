@@ -485,7 +485,7 @@ def start(bot, update):
 
 
 def help(bot, update):
-    bot.send_message(update.message.chat.id, 'TBD')
+    bot.send_message(update.message.chat.id, help_text)
 
 
 def help_ru(bot, update):
