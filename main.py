@@ -161,6 +161,7 @@ def load_clan_war_info_raw(clan_tag, skip_as_lose, last_season):
 
 
 def load_clan_war_info(clan_tag, skip_as_lose, last_season):
+    clan_members = load_clan_members(clan_tag)
     clan_war_info = load_clan_war_info_raw(clan_tag, skip_as_lose, last_season)
     sorted_players = []
     for tag, participants in clan_war_info.items():
