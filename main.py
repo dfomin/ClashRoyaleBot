@@ -377,7 +377,7 @@ def clan_war(bot, update, args):
     for info in clan_war_info:
         answer += info + "\n"
 
-    bot.send_message(update.message.chat.id, '```' + answer + '```', parse_mode="Markdown")
+    bot.send_message(update.message.chat.id, '``' + answer + '``', parse_mode="Markdown")
 
 
 def clan_war_ece(bot, update, args):
