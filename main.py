@@ -393,6 +393,8 @@ def clan_war_ece(bot, update, args):
     for info in clan_war_info:
         answer += info + "\n"
 
+    answer = answer.replace('`', '\`')
+
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
@@ -407,6 +409,8 @@ def clan_war_ece_last_season(bot, update, args):
     for info in clan_war_info:
         answer += info + "\n"
 
+    answer = answer.replace('`', '\`')
+
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
@@ -417,6 +421,8 @@ def clan_skips(bot, update, args):
         return
 
     answer = load_clan_war_skips_info(tag)
+
+    answer = answer.replace('`', '\`')
 
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
@@ -429,6 +435,8 @@ def clan_stat(bot, update, args):
 
     answer = get_stat(tag)
 
+    answer = answer.replace('`', '\`')
+
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
@@ -440,6 +448,8 @@ def max_win_streak(bot, update, args):
 
     answer = load_win_streak_info(tag)
 
+    answer = answer.replace('`', '\`')
+
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
@@ -450,6 +460,8 @@ def current_win_streak(bot, update, args):
         return
 
     answer = load_current_win_streak_info(tag)
+
+    answer = answer.replace('`', '\`')
 
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
@@ -464,6 +476,8 @@ def card_collection(bot, update, args):
     if len(answer) == 0:
         answer = "No one skips collection day."
 
+    answer = answer.replace('`', '\`')
+
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
 
@@ -474,6 +488,8 @@ def player_clan_war_stat(bot, update, args):
         return
 
     answer = load_player_clan_war_win_rate(tag)
+
+    answer = answer.replace('`', '\`')
 
     bot.send_message(update.message.chat.id, '`' + answer + '`', parse_mode="Markdown")
 
