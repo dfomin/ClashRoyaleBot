@@ -1,4 +1,5 @@
 from telegram.ext import Updater, Filters, CommandHandler
+from collections import defaultdict
 import requests
 import sys
 
@@ -79,6 +80,22 @@ def load_clan_members(clan_tag):
     member_list = clan_info['memberList']
     for member in member_list:
         result[member['tag']] = member['name']
+
+    return result
+
+
+def load_clan_role(clan_tag):
+    params = dict(
+        authorization=royaleToken
+    )
+
+    r = requests.get(url='https://api.clashroyale.com/v1/clans/%23' + clan_tag, params=params)
+
+    result = {}
+    clan_info = r.json()
+    member_list = clan_info['memberList']
+    for member in member_list:
+        result[member['tag']] = member['role']
 
     return result
 
@@ -344,6 +361,54 @@ def load_current_win_streak_info(clan_tag):
     return answer
 
 
+def load_clan_war_filter(clan_tag, win_streak, last_ten, role):
+    clan_members = load_clan_members(clan_tag)
+    clan_roles = load_clan_role(clan_tag)
+    max_win_streak = dict.fromkeys(clan_members, 0)
+    current_win_streak = dict.fromkeys(clan_members, 0)
+    last_ten_result = defaultdict(list)
+
+    params = dict(
+        authorization=royaleToken
+    )
+
+    r = requests.get(url='https://api.clashroyale.com/v1/clans/%23' + clan_tag + '/warlog', params=params)
+
+    all_data = r.json()
+    for item in all_data['items']:
+        participants = item['participants']
+        for participant in participants:
+            player_tag = participant['tag']
+            if player_tag in clan_members:
+                current_win_streak[player_tag] += participant['wins']
+                if participant['wins'] < participant['battlesPlayed']:
+                    if max_win_streak[player_tag] < current_win_streak[player_tag]:
+                        max_win_streak[player_tag] = current_win_streak[player_tag]
+                    current_win_streak[player_tag] = participant['wins']
+
+                loses = participant['battlesPlayed'] - participant['wins']
+                wins = participant['wins']
+                for i in range(loses):
+                    last_ten_result[player_tag].append(0)
+
+                for i in range(wins):
+                    last_ten_result[player_tag].append(1)
+
+    for player_tag in clan_members:
+        if max_win_streak[player_tag] < current_win_streak[player_tag]:
+            max_win_streak[player_tag] = current_win_streak[player_tag]
+
+    result = ""
+    for player_tag in clan_members:
+        if len(last_ten_result[player_tag]) > 10:
+            player_last_ten = sum(last_ten_result[player_tag][-10:])
+        else:
+            player_last_ten = sum(last_ten_result[player_tag])
+        if (len(role) == 0 or clan_roles[player_tag] == role) and max_win_streak[player_tag] >= win_streak and player_last_ten >= last_ten:
+            result += clan_members[player_tag] + " " + str(max_win_streak[player_tag]) + " " + str(player_last_ten) + " " + clan_roles[player_tag] + "\n"
+    return result
+
+
 def get_stat(tag):
     standings = load_clan_war_standing(tag)
     battles = 0
@@ -415,6 +480,22 @@ def clan_skips(bot, update, args):
         return
 
     answer = load_clan_war_skips_info(tag)
+
+    bot.send_message(update.message.chat.id, '<pre>' + answer + '</pre>', parse_mode="HTML")
+
+
+def cwfilter(bot, update, args):
+    if len(args) != 3 and len(args) != 4:
+        bot.send_message(update.message.chat.id, 'Invalid arguments')
+        return
+
+    tag = args[0]
+    tag = tag.replace('#', '').upper()
+    win_streak = args[1]
+    last_ten = args[2]
+    role = args[3] if len(args) == 4 else ''
+
+    answer = load_clan_war_filter(tag, win_streak, last_ten, role)
 
     bot.send_message(update.message.chat.id, '<pre>' + answer + '</pre>', parse_mode="HTML")
 
@@ -508,6 +589,7 @@ def main():
     dp.add_handler(CommandHandler("clanwarece", clan_war_ece, pass_args=True))
     dp.add_handler(CommandHandler("clanwarecelastseason", clan_war_ece_last_season, pass_args=True))
     dp.add_handler(CommandHandler("skips", clan_skips, pass_args=True))
+    dp.add_handler(CommandHandler("cwfilter", filter, pass_args=True))
     dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
     dp.add_handler(CommandHandler("maxwinstreak", max_win_streak, pass_args=True))
     dp.add_handler(CommandHandler("winstreak", current_win_streak, pass_args=True))
@@ -516,7 +598,7 @@ def main():
 
     updater.idle()
 
-    # answer = load_clan_war_info('2UJ2GJ', False, False)
+    # answer = load_clan_war_info('202C22R9', False, False)
     # print(answer)
     # answer = get_stat('2UJ2GJ')
     # print(answer)
@@ -529,6 +611,8 @@ def main():
     # answer = load_clan_war_info('2UJ2GJ', True, True)
     # print(answer)
     # answer = load_clan_war_skips_info('2UJ2GJ')
+    # print(answer)
+    # answer = load_clan_war_filter('2UJ2GJ', 4, 6, '')
     # print(answer)
 
 
