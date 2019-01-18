@@ -491,11 +491,13 @@ def cwfilter(bot, update, args):
 
     tag = args[0]
     tag = tag.replace('#', '').upper()
-    win_streak = args[1]
-    last_ten = args[2]
+    win_streak = int(args[1])
+    last_ten = int(args[2])
     role = args[3] if len(args) == 4 else ''
 
     answer = load_clan_war_filter(tag, win_streak, last_ten, role)
+    if len(answer) == 0:
+        answer = "∅"
 
     bot.send_message(update.message.chat.id, '<pre>' + answer + '</pre>', parse_mode="HTML")
 
@@ -589,7 +591,7 @@ def main():
     dp.add_handler(CommandHandler("clanwarece", clan_war_ece, pass_args=True))
     dp.add_handler(CommandHandler("clanwarecelastseason", clan_war_ece_last_season, pass_args=True))
     dp.add_handler(CommandHandler("skips", clan_skips, pass_args=True))
-    dp.add_handler(CommandHandler("cwfilter", filter, pass_args=True))
+    dp.add_handler(CommandHandler("cwfilter", cwfilter, pass_args=True))
     dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
     dp.add_handler(CommandHandler("maxwinstreak", max_win_streak, pass_args=True))
     dp.add_handler(CommandHandler("winstreak", current_win_streak, pass_args=True))
