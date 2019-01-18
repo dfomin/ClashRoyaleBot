@@ -30,6 +30,8 @@ This command has a few variations:
 
 /skips <clan tag> ('/skips 2UJ2GJ') shows statistics about missed battles in collection day and final battle of the last 10 clan wars.
 
+/cwfilter <clan tag> <win streak> <wins> <role (optional)> ('/cwfilter 2UJ2GJ 2 5') filters players with given role (or all if skipped) who has at least <win streak> wins in a row and at least <wins> in last 10 clan wars. role can be: member|elder|coLeader|leader.
+
 /clanstat <clan tag> ('/clanstat 2UJ2GJ') shows results of the clan for last 10 clan wars (useful to estimate averate skill of the clan):
 <result place in clan war> <percentage of wins in the clan war>
 
@@ -56,6 +58,8 @@ _ - игрок сыграл первый день и не провел фина�
 /clanwarecelastseason - то же самое, что и clanwarece, но учитывает только войны в последнем сезоне (их может быть от 1 до 7).
 
 /skips <тэг клана> (например, '/skips 2UJ2GJ') выводит статистику по пропуску дней сбора и финальных битв за последние 10 кв.
+
+/cwfilter <clan tag> <win streak> <wins> <role (опционально)> ('/cwfilter 2UJ2GJ 2 5') выводит игроков с данной ролью (или всех, если она не указана), у которых как минимум <win streak> побед подряд и как минимум <wins> побед в последних 10 клановых войнах. role может быть: member|elder|coLeader|leader.
 
 /clanstat <тэг клана> (например, '/clanstat 2UJ2GJ') выводит статистику клана за 10 последних кв (удобно для оценки уровня клана соперника):
 <место которое занял клан> <процент побед в финальной битве в этой войне>
