@@ -72,6 +72,10 @@ _ - игрок сыграл первый день и не провел фина�
 '''
 
 
+def escape(s):
+    return s.replace('<', '&lt;').replace('>', '&gt;').replace('&', '&amp;')
+
+
 def load_clan_members(clan_tag):
     params = dict(
         authorization=royaleToken
@@ -446,7 +450,7 @@ def clan_war(bot, update, args):
     for info in clan_war_info:
         answer += info + "\n"
 
-    bot.send_message(update.message.chat.id, '<pre>' + html.escape(answer) + '</pre>', parse_mode="HTML")
+    bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
 
 
 def clan_war_ece(bot, update, args):
@@ -460,7 +464,7 @@ def clan_war_ece(bot, update, args):
     for info in clan_war_info:
         answer += info + "\n"
 
-    bot.send_message(update.message.chat.id, '<pre>' + answer + '</pre>', parse_mode="HTML")
+    bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
 
 
 def clan_war_ece_last_season(bot, update, args):
@@ -474,7 +478,7 @@ def clan_war_ece_last_season(bot, update, args):
     for info in clan_war_info:
         answer += info + "\n"
 
-    bot.send_message(update.message.chat.id, '<pre>' + answer + '</pre>', parse_mode="HTML")
+    bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
 
 
 def clan_skips(bot, update, args):
@@ -485,7 +489,7 @@ def clan_skips(bot, update, args):
 
     answer = load_clan_war_skips_info(tag)
 
-    bot.send_message(update.message.chat.id, '<pre>' + answer + '</pre>', parse_mode="HTML")
+    bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
 
 
 def cwfilter(bot, update, args):
@@ -503,7 +507,7 @@ def cwfilter(bot, update, args):
     if len(answer) == 0:
         answer = "∅"
 
-    bot.send_message(update.message.chat.id, '<pre>' + answer + '</pre>', parse_mode="HTML")
+    bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
 
 
 def clan_stat(bot, update, args):
@@ -514,7 +518,7 @@ def clan_stat(bot, update, args):
 
     answer = get_stat(tag)
 
-    bot.send_message(update.message.chat.id, '<pre>' + answer + '</pre>', parse_mode="HTML")
+    bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
 
 
 def max_win_streak(bot, update, args):
@@ -525,7 +529,7 @@ def max_win_streak(bot, update, args):
 
     answer = load_win_streak_info(tag)
 
-    bot.send_message(update.message.chat.id, '<pre>' + answer + '</pre>', parse_mode="HTML")
+    bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
 
 
 def current_win_streak(bot, update, args):
@@ -536,7 +540,7 @@ def current_win_streak(bot, update, args):
 
     answer = load_current_win_streak_info(tag)
 
-    bot.send_message(update.message.chat.id, '<pre>' + answer + '</pre>', parse_mode="HTML")
+    bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
 
 
 def card_collection(bot, update, args):
@@ -549,7 +553,7 @@ def card_collection(bot, update, args):
     if len(answer) == 0:
         answer = "No one skips collection day."
 
-    bot.send_message(update.message.chat.id, '<pre>' + answer + '</pre>', parse_mode="HTML")
+    bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
 
 
 def player_clan_war_stat(bot, update, args):
@@ -560,7 +564,7 @@ def player_clan_war_stat(bot, update, args):
 
     answer = load_player_clan_war_win_rate(tag)
 
-    bot.send_message(update.message.chat.id, '<pre>' + answer + '</pre>', parse_mode="HTML")
+    bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
 
 
 def about(bot, update):
