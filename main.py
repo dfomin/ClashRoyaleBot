@@ -537,7 +537,7 @@ def last_seen(bot, update, args):
 
     tag = args[0]
     tag = tag.replace('#', '').upper()
-    days = args[1]
+    days = int(args[1])
 
     answer = ""
     members = clan_last_seen_members(tag, days)
