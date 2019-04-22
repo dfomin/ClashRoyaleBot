@@ -530,6 +530,26 @@ def cwfilter(bot, update, args):
     bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
 
 
+def last_seen(bot, update, args):
+    if len(args) != 2:
+        bot.send_message(update.message.chat.id, 'Invalid arguments')
+        return
+
+    tag = args[0]
+    days = args[1]
+
+    answer = ""
+    members = clan_last_seen_members(tag, days)
+    if len(members) == 0:
+        answer = "∅"
+    else:
+        members.sort(key=lambda x: (x[1]), reverse=True)
+        for key, value in members:
+            answer += value + ": " + value + "\n"
+
+    bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
+
+
 def clan_stat(bot, update, args):
     tag = get_tag(args)
     if tag is None:
@@ -620,6 +640,7 @@ def main():
     dp.add_handler(CommandHandler("clanwarecelastseason", clan_war_ece_last_season, pass_args=True))
     dp.add_handler(CommandHandler("skips", clan_skips, pass_args=True))
     dp.add_handler(CommandHandler("cwfilter", cwfilter, pass_args=True))
+    dp.add_handler(CommandHandler("lastseen", last_seen, pass_args=True))
     dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
     dp.add_handler(CommandHandler("maxwinstreak", max_win_streak, pass_args=True))
     dp.add_handler(CommandHandler("winstreak", current_win_streak, pass_args=True))
@@ -628,7 +649,7 @@ def main():
 
     updater.idle()
 
-    # answer = load_clan_war_info('202C22R9', False, False)
+    # answer = load_clan_war_info('2UJ2GJ', False, False)
     # print(answer)
     # answer = get_stat('2UJ2GJ')
     # print(answer)
@@ -644,7 +665,7 @@ def main():
     # print(answer)
     # answer = load_clan_war_filter('2UJ2GJ', 4, 6, '')
     # print(answer)
-    # answer = clan_last_seen_members('2UJ2GJ', 2)
+    # answer = clan_last_seen_members('2UJ2GJ', 0)
     # print(answer)
 
 
