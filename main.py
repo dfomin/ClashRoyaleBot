@@ -2,6 +2,7 @@ from telegram.ext import Updater, Filters, CommandHandler
 from collections import defaultdict
 import requests
 import sys
+from datetime import datetime
 
 if sys.version_info[0] < 3:
     raise Exception("Must be using Python 3")
@@ -439,6 +440,25 @@ def get_tag(args):
     return tag
 
 
+def clan_last_seen_members(clan_tag, days):
+    params = dict(
+        authorization=royaleToken
+    )
+
+    r = requests.get(url='https://api.clashroyale.com/v1/clans/%23' + clan_tag, params=params)
+    result = {}
+    clan_info = r.json()
+
+    member_list = clan_info['memberList']
+    for member in member_list:
+        last_seen_time = member['lastSeen']
+        delta_time_last_seen = datetime.now() - datetime.strptime(last_seen_time[:-5], "%Y%m%dT%H%M%S")
+        if delta_time_last_seen.days >= days:
+            result[member['name']] = delta_time_last_seen.days
+
+    return result
+
+
 def clan_war(bot, update, args):
     tag = get_tag(args)
     if tag is None:
@@ -623,6 +643,8 @@ def main():
     # answer = load_clan_war_skips_info('2UJ2GJ')
     # print(answer)
     # answer = load_clan_war_filter('2UJ2GJ', 4, 6, '')
+    # print(answer)
+    # answer = clan_last_seen_members('2UJ2GJ', 2)
     # print(answer)
 
 
