@@ -452,7 +452,7 @@ def clan_last_seen_members(clan_tag, days):
     member_list = clan_info['memberList']
     for member in member_list:
         last_seen_time = member['lastSeen']
-        delta_time_last_seen = datetime.now() - datetime.strptime(last_seen_time[:-5], "%Y%m%dT%H%M%S")
+        delta_time_last_seen = datetime.now() - datetime.strptime(last_seen_time, "%Y%m%dT%H%M%S.%fZ")
         if delta_time_last_seen.days >= days:
             result[member['name']] = delta_time_last_seen.days
 
