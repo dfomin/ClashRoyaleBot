@@ -536,6 +536,7 @@ def last_seen(bot, update, args):
         return
 
     tag = args[0]
+    tag = tag.replace('#', '').upper()
     days = args[1]
 
     answer = ""
