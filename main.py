@@ -544,9 +544,9 @@ def last_seen(bot, update, args):
     if len(members) == 0:
         answer = "∅"
     else:
-        members.sort(key=lambda x: (x[1]), reverse=True)
-        for key, value in members:
-            answer += value + ": " + value + "\n"
+        sorted_members = sorted(members.items(), key=lambda x: -x[1])
+        for info in sorted_members:
+            answer += info[0] + ": " + str(info[1]) + "\n"
 
     bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
 
