@@ -374,11 +374,13 @@ def load_current_win_streak_info(clan_tag):
     return answer
 
 
-def load_clan_war_filter(clan_tag, win_streak, last_ten, role):
+def load_clan_war_filter(clan_tag, win_streak, last_ten, first_day_skips, second_day_skips, role):
     clan_members = load_clan_members(clan_tag)
     clan_roles = load_clan_role(clan_tag)
     max_win_streak = dict.fromkeys(clan_members, 0)
     current_win_streak = dict.fromkeys(clan_members, 0)
+    max_first_day_skips = dict.fromkeys(clan_members, 0)
+    max_second_day_skips = dict.fromkeys(clan_members, 0)
     last_ten_result = defaultdict(list)
 
     params = dict(
@@ -411,14 +413,28 @@ def load_clan_war_filter(clan_tag, win_streak, last_ten, role):
         if max_win_streak[player_tag] < current_win_streak[player_tag]:
             max_win_streak[player_tag] = current_win_streak[player_tag]
 
+    for item in all_data['items']:
+        participants = item['participants']
+        for participant in participants:
+            player_tag = participant['tag']
+            if player_tag in clan_members:
+                max_first_day_skips[player_tag] += 3 - participant['collectionDayBattlesPlayed']
+                if participant['battlesPlayed'] == 0:
+                    max_second_day_skips[player_tag] += 1
+
     result = ""
     for player_tag in clan_members:
         if len(last_ten_result[player_tag]) > 10:
             player_last_ten = sum(last_ten_result[player_tag][-10:])
         else:
             player_last_ten = sum(last_ten_result[player_tag])
-        if (len(role) == 0 or clan_roles[player_tag] == role) and max_win_streak[player_tag] >= win_streak and player_last_ten >= last_ten:
-            result += clan_members[player_tag] + " " + str(max_win_streak[player_tag]) + " " + str(player_last_ten) + " " + clan_roles[player_tag] + "\n"
+        if (len(role) == 0 or clan_roles[player_tag] == role) and \
+                (max_win_streak[player_tag] >= win_streak or player_last_ten >= last_ten) \
+                and max_first_day_skips[player_tag] < first_day_skips \
+                and max_second_day_skips[player_tag] < second_day_skips:
+            result += clan_members[player_tag] + " " + str(max_win_streak[player_tag]) + " " + str(
+                player_last_ten) + " " + str(max_first_day_skips[player_tag]) + " " + str(
+                max_second_day_skips[player_tag]) + " " + clan_roles[player_tag] + "\n"
     return result
 
 
@@ -668,7 +684,7 @@ def main():
     # print(answer)
     # answer = load_clan_war_skips_info('2UJ2GJ')
     # print(answer)
-    # answer = load_clan_war_filter('2UJ2GJ', 4, 6, '')
+    # answer = load_clan_war_filter('2UJ2GJ', 3, 5, 2, 1, '')
     # print(answer)
     # answer = clan_last_seen_members('2UJ2GJ', 0)
     # print(answer)
