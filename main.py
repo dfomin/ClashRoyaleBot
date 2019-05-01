@@ -533,7 +533,7 @@ def clan_skips(bot, update, args):
 
 
 def cwfilter(bot, update, args):
-    if len(args) != 3 and len(args) != 4:
+    if len(args) != 5 and len(args) != 6:
         bot.send_message(update.message.chat.id, 'Invalid arguments')
         return
 
@@ -541,9 +541,11 @@ def cwfilter(bot, update, args):
     tag = tag.replace('#', '').upper()
     win_streak = int(args[1])
     last_ten = int(args[2])
-    role = args[3] if len(args) == 4 else ''
+    first_day_skips = int(args[3])
+    second_day_skips = int(args[4])
+    role = args[5] if len(args) == 6 else ''
 
-    answer = load_clan_war_filter(tag, win_streak, last_ten, role)
+    answer = load_clan_war_filter(tag, win_streak, last_ten, first_day_skips, second_day_skips, role)
     if len(answer) == 0:
         answer = "∅"
 
