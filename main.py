@@ -31,7 +31,7 @@ This command has a few variations:
 
 /skips <clan tag> ('/skips 2UJ2GJ') shows statistics about missed battles in collection day and final battle of the last 10 clan wars.
 
-/cwfilter <clan tag> <win streak> <wins> <role (optional)> ('/cwfilter 2UJ2GJ 2 5') filters players with given role (or all if skipped) who has at least <win streak> wins in a row and at least <wins> in last 10 clan wars. role can be: member|elder|coLeader|leader.
+/cwfilter <clan tag> <win streak> <wins> <skips1> <skips2> <role (optional)> ('/cwfilter 2UJ2GJ 2 5 1 0') filters players with given role (or all if skipped) who has at least <win streak> wins in a row or at least <wins> in last 10 clan wars and not more than <skips1> skips in collection day and not more than <skips2> skips in war day. role can be: member|elder|coLeader|leader.
 
 /lastseen <clan tag> <days count> ('/lastseen 2UJ2GJ 2') shows players who were not online more than <days count> days.
 
@@ -62,7 +62,7 @@ _ - игрок сыграл первый день и не провел фина�
 
 /skips <тэг клана> (например, '/skips 2UJ2GJ') выводит статистику по пропуску дней сбора и финальных битв за последние 10 кв.
 
-/cwfilter <clan tag> <win streak> <wins> <role (опционально)> ('/cwfilter 2UJ2GJ 2 5') выводит игроков с данной ролью (или всех, если она не указана), у которых как минимум <win streak> побед подряд и как минимум <wins> побед в последних 10 клановых войнах. role может быть: member|elder|coLeader|leader.
+/cwfilter <clan tag> <win streak> <skips1> <skips2> <wins> <role (опционально)> ('/cwfilter 2UJ2GJ 2 5') выводит игроков с данной ролью (или всех, если она не указана), у которых как минимум <win streak> побед подряд или как минимум <wins> побед в последних 10 клановых войнах при этом не более <skips1> и <skips2> пропусков в первый и второй дни войны. role может быть: member|elder|coLeader|leader.
 
 /lastseen <clan tag> <days count> ('/lastseen 2UJ2GJ 2') выводит игроков которые не были онлайн в игре >= полных <days count> дней.
 
