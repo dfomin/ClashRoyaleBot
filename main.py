@@ -409,16 +409,14 @@ def load_clan_war_filter(clan_tag, win_streak, last_ten, first_day_skips, second
         if max_win_streak[player_tag] < current_win_streak[player_tag]:
             max_win_streak[player_tag] = current_win_streak[player_tag]
 
-    for item in reversed(all_data['items']):
+    for item in all_data['items']:
         participants = item['participants']
         for participant in participants:
             player_tag = participant['tag']
             if player_tag in clan_members:
-                max_first_day_skips[player_tag] = 3 - participant['collectionDayBattlesPlayed']
-                if participant['battlesPlayed'] == 2 or participant['battlesPlayed'] == 1:
-                    max_second_day_skips[player_tag] = 0
-                else:
-                    max_second_day_skips[player_tag] = 1
+                max_first_day_skips[player_tag] += 3 - participant['collectionDayBattlesPlayed']
+                if participant['battlesPlayed'] == 0:
+                    max_second_day_skips[player_tag] += 1
 
     result = ""
     for player_tag in clan_members:
