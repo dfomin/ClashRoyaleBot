@@ -430,8 +430,8 @@ def load_clan_war_filter(clan_tag, win_streak, last_ten, first_day_skips, second
             player_last_ten = sum(last_ten_result[player_tag])
         if (len(role) == 0 or clan_roles[player_tag] == role) and \
                 (max_win_streak[player_tag] >= win_streak or player_last_ten >= last_ten) \
-                and max_first_day_skips[player_tag] < first_day_skips \
-                and max_second_day_skips[player_tag] < second_day_skips:
+                and max_first_day_skips[player_tag] <= first_day_skips \
+                and max_second_day_skips[player_tag] <= second_day_skips:
             result += clan_members[player_tag] + " " + str(max_win_streak[player_tag]) + " " + str(
                 player_last_ten) + " " + str(max_first_day_skips[player_tag]) + " " + str(
                 max_second_day_skips[player_tag]) + " " + clan_roles[player_tag] + "\n"
