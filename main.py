@@ -203,17 +203,16 @@ def load_clan_war_info(clan_tag, skip_as_lose, last_season):
         for participant in participants:
             if participant is not None:
                 wins += participant['wins']
-                battles += participant['battlesPlayed']
+                battles += participant['numberOfBattles'] if skip_as_lose else participant['battlesPlayed']
 
-                if participant['battlesPlayed'] == 0 and skip_as_lose:
-                    battles += 1
-
-                if participant['battlesPlayed'] < 2:
+                if participant['numberOfBattles'] < 2:
                     plays += "1" if participant['wins'] > 0 else "0" if participant['battlesPlayed'] > 0 else "_"
                 else:
                     plays += "("
                     for war_battle in range(participant['battlesPlayed']):
                         plays += "1" if war_battle < participant['wins'] else "0"
+                    for war_battle in range(participant['battlesPlayed'], participant['numberOfBattles']):
+                        plays += "_"
                     plays += ")"
             else:
                 plays += "x"
