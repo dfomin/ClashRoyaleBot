@@ -1,6 +1,7 @@
 from telegram.ext import Updater, Filters, CommandHandler
 from collections import defaultdict
 import requests
+from requests_html import HTMLSession
 import sys
 from datetime import datetime
 
@@ -629,6 +630,44 @@ def player_clan_war_stat(bot, update, args):
     bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
 
 
+def load_player_clan_war_history(player_tag, count):
+    params = dict(
+        authorization=royaleApiToken
+    )
+
+    session = HTMLSession()
+    r = session.get(url="https://royaleapi.com/inc/player/cw_history?player_tag=" + player_tag, params=params)
+    a = r.html.xpath('a')
+    results = list(map(lambda x: x.text.split('\n')[0], a))
+    results = results if count <= 0 else results[:count]
+    results = list(reversed(results))
+    log = ""
+    for i in range(len(results)):
+        wins, battles = results[i].split(' / ')
+        if battles == '1':
+            log += wins
+        else:
+            log += "("
+            for i in range(int(wins)):
+                log += "1"
+            for i in range(int(battles) - int(wins)):
+                log += "0"
+            log += ")"
+
+    return log
+
+
+def clan_war_history(bot, update, args):
+    tag = get_tag(args)
+    if tag is None:
+        bot.send_message(update.message.chat.id, 'Invalid clan tag')
+        return
+
+    answer = load_player_clan_war_history(tag, count)
+
+    bot.send_message(update.message.chat.id, '<pre>' + escape(answer) + '</pre>', parse_mode="HTML")
+
+
 def about(bot, update):
     bot.send_message(update.message.chat.id, about_text)
 
@@ -647,29 +686,29 @@ def help_ru(bot, update):
 
 
 def main():
-    updater = Updater(token)
-    updater.start_webhook(listen='127.0.0.1', port=5000, url_path=token)
-    updater.bot.set_webhook(url='https://pigowl.com:443/' + token)
-
-    dp = updater.dispatcher
-
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
-    dp.add_handler(CommandHandler("help_ru", help_ru))
-    dp.add_handler(CommandHandler("about", about))
-    dp.add_handler(CommandHandler("clanwar", clan_war, pass_args=True))
-    dp.add_handler(CommandHandler("clanwarece", clan_war_ece, pass_args=True))
-    dp.add_handler(CommandHandler("clanwarecelastseason", clan_war_ece_last_season, pass_args=True))
-    dp.add_handler(CommandHandler("skips", clan_skips, pass_args=True))
-    dp.add_handler(CommandHandler("cwfilter", cwfilter, pass_args=True))
-    dp.add_handler(CommandHandler("lastseen", last_seen, pass_args=True))
-    dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
-    dp.add_handler(CommandHandler("maxwinstreak", max_win_streak, pass_args=True))
-    dp.add_handler(CommandHandler("winstreak", current_win_streak, pass_args=True))
-    dp.add_handler(CommandHandler("collectiondayskip", card_collection, pass_args=True))
-    dp.add_handler(CommandHandler("playercwstat", player_clan_war_stat, pass_args=True))
-
-    updater.idle()
+    # updater = Updater(token)
+    # updater.start_webhook(listen='127.0.0.1', port=5000, url_path=token)
+    # updater.bot.set_webhook(url='https://pigowl.com:443/' + token)
+    #
+    # dp = updater.dispatcher
+    #
+    # dp.add_handler(CommandHandler("start", start))
+    # dp.add_handler(CommandHandler("help", help))
+    # dp.add_handler(CommandHandler("help_ru", help_ru))
+    # dp.add_handler(CommandHandler("about", about))
+    # dp.add_handler(CommandHandler("clanwar", clan_war, pass_args=True))
+    # dp.add_handler(CommandHandler("clanwarece", clan_war_ece, pass_args=True))
+    # dp.add_handler(CommandHandler("clanwarecelastseason", clan_war_ece_last_season, pass_args=True))
+    # dp.add_handler(CommandHandler("skips", clan_skips, pass_args=True))
+    # dp.add_handler(CommandHandler("cwfilter", cwfilter, pass_args=True))
+    # dp.add_handler(CommandHandler("lastseen", last_seen, pass_args=True))
+    # dp.add_handler(CommandHandler("clanstat", clan_stat, pass_args=True))
+    # dp.add_handler(CommandHandler("maxwinstreak", max_win_streak, pass_args=True))
+    # dp.add_handler(CommandHandler("winstreak", current_win_streak, pass_args=True))
+    # dp.add_handler(CommandHandler("collectiondayskip", card_collection, pass_args=True))
+    # dp.add_handler(CommandHandler("playercwstat", player_clan_war_stat, pass_args=True))
+    #
+    # updater.idle()
 
     # answer = load_clan_war_info('2UJ2GJ', False, False)
     # print(answer)
@@ -681,11 +720,13 @@ def main():
     # print(answer)
     # answer = load_card_collection_info('2UJ2GJ')
     # print(answer)
-    # answer = load_clan_war_info('2UJ2GJ', True, True)
+    # answer = load_clan_war_info('2UJ2GJ', False, False)
     # print(answer)
+    answer = load_player_clan_war_history('8RQVRJUC', 10)
+    print(answer)
     # answer = load_clan_war_skips_info('2UJ2GJ')
     # print(answer)
-    # answer = load_clan_war_filter('2UJ2GJ', 3, 5, 2, 1, '')
+    # answer = load_clan_war_filter('2UJ2GJ', 3, 5, 2, 0, 'member')
     # print(answer)
     # answer = clan_last_seen_members('2UJ2GJ', 0)
     # print(answer)
