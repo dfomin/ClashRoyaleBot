@@ -4,15 +4,16 @@ from private import royaleToken
 
 
 class ServerManager:
-    def get_clan_info(self, tag):
+    def get_clan_info(self, tag: str) -> Clan:
         tag = tag.replace("#", "")
 
-        clan = self.download_clan_info(tag)
-        clan_war = self.download_clan_war_info(tag)
+        clan = ServerManager.download_clan_info(tag)
+        clan_war = ServerManager.download_clan_war_info(tag)
 
         return Clan(clan, clan_war)
 
-    def download_clan_info(self, tag):
+    @staticmethod
+    def download_clan_info(tag: str):
         params = dict(
             authorization=royaleToken
         )
@@ -21,7 +22,8 @@ class ServerManager:
         clan_info = r.json()
         return clan_info
 
-    def download_clan_war_info(self, tag):
+    @staticmethod
+    def download_clan_war_info(tag: str):
         params = dict(
             authorization=royaleToken
         )

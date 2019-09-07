@@ -735,11 +735,14 @@ def help_ru(bot, update):
 
 
 from server_manager import ServerManager
+from clan_war_manager import ClanWarManager
 
 if __name__ == "__main__":
     #main()
 
     server_manager = ServerManager()
     clan = server_manager.get_clan_info("#2UJ2GJ")
-    for date, clan_war in clan.clan_wars.items():
-        print(date)
+    cw_manager = ClanWarManager(clan)
+    clan_war_result = cw_manager.get_clan_war_result()
+    for result in clan_war_result:
+        print(result)
