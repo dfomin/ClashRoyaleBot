@@ -9,7 +9,8 @@ if sys.version_info[0] < 3:
     raise Exception("Must be using Python 3")
 
 token = ''
-royaleToken = ''
+royaleToken = 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6IjVkODdhZGUyLTE1MjItNDNlZi1hMGU1LTA3NzAzZGZiY2I2NSIsImlhdCI6MTUzNTE4NjIxNCwic3ViIjoiZGV2ZWxvcGVyLzFkZGY5YmJmLTg5MTUtMjBjOS0yOGFhLTBhMTYwOWI3YmMyOCIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI5MS4xODQuMjE5LjgxIl0sInR5cGUiOiJjbGllbnQifV19.dJWavhfuQKN6XugL5JvaLC0qlDevSEpe_tfJX0f6s63zG_q_Zuh3KMnFr014qp6Oj6_4rpWayiHsoYhdRK2Rpg'
+royaleApiToken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjMzMCwiaWRlbiI6IjQ5MDA2NTg4NDE3NDYxNDUyOSIsIm1kIjp7InVzZXJuYW1lIjoiZGZvbWluIiwia2V5VmVyc2lvbiI6MywiZGlzY3JpbWluYXRvciI6Ijk3NzQifSwidHMiOjE1NDk1NTIwMTY4NTF9.Fji2gJptAIBZvbtL5k4aComvMIlFHxVpyvpXk3xI_-M'
 
 about_text = '''This is free open source telegram bot for clash royale statistics.
 You can contribute here https://github.com/dfomin/ClashRoyaleBot.
@@ -466,6 +467,7 @@ def clan_last_seen_members(clan_tag, days):
     )
 
     r = requests.get(url='https://api.clashroyale.com/v1/clans/%23' + clan_tag, params=params)
+    print(r)
     result = {}
     clan_info = r.json()
 
@@ -685,7 +687,7 @@ def help_ru(bot, update):
     bot.send_message(update.message.chat.id, help_text_ru)
 
 
-def main():
+# def main():
     # updater = Updater(token)
     # updater.start_webhook(listen='127.0.0.1', port=5000, url_path=token)
     # updater.bot.set_webhook(url='https://pigowl.com:443/' + token)
@@ -722,8 +724,8 @@ def main():
     # print(answer)
     # answer = load_clan_war_info('2UJ2GJ', False, False)
     # print(answer)
-    answer = load_player_clan_war_history('8RQVRJUC', 10)
-    print(answer)
+    # answer = load_player_clan_war_history('8RQVRJUC', 10)
+    # print(answer)
     # answer = load_clan_war_skips_info('2UJ2GJ')
     # print(answer)
     # answer = load_clan_war_filter('2UJ2GJ', 3, 5, 2, 0, 'member')
@@ -732,5 +734,12 @@ def main():
     # print(answer)
 
 
+from server_manager import ServerManager
+
 if __name__ == "__main__":
-    main()
+    #main()
+
+    server_manager = ServerManager()
+    clan = server_manager.get_clan_info("#2UJ2GJ")
+    for date, clan_war in clan.clan_wars.items():
+        print(date)
