@@ -736,13 +736,28 @@ def help_ru(bot, update):
 
 from server_manager import ServerManager
 from clan_war_manager import ClanWarManager
+from file_clan_war_storage import FileClanWarStorage
+from clan import Clan
+from pathlib import Path
 
 if __name__ == "__main__":
     #main()
 
+    storage = FileClanWarStorage(Path("/Users/dfomin/Downloads/cw/"))
+    clan_wars_info = list(filter(lambda x: x.date > "20190902T130358.000Z", storage.get_clan_wars()))
+    clan_wars = {x.date: x for x in clan_wars_info}
+
     server_manager = ServerManager()
     clan = server_manager.get_clan_info("#2UJ2GJ")
+
+    clan.clan_wars = clan_wars
+
     cw_manager = ClanWarManager(clan)
-    clan_war_result = cw_manager.get_clan_war_result()
-    for result in clan_war_result:
+    results = []
+    for tag, member in clan.members.items():
+        role = member.role
+        cw_result = cw_manager.get_member_clan_war_result(tag)
+        if role != "leader" and role != "coLeader" and not cw_result.day_1_skips() and not cw_result.day_2_skips():
+            results.append(cw_result)
+    for result in sorted(results):
         print(result)
