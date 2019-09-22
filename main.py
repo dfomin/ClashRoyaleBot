@@ -753,11 +753,23 @@ if __name__ == "__main__":
     clan.clan_wars = clan_wars
 
     cw_manager = ClanWarManager(clan)
+
+    leaders = list(map(lambda x: x.name, filter(lambda x: x.role in ['leader', 'coLeader'], clan.members.values())))
+    print("Соруки и лидер не участвуют в розыгрыше: " + ", ".join(leaders))
+
+    banned = []
+    for tag, member in clan.members.items():
+        cw_result = cw_manager.get_member_clan_war_result(tag)
+        if cw_result.day_1_skips() or cw_result.day_2_skips():
+            banned.append(cw_result.name)
+    print("Не доигравшие сбор или пропустившие финальную атаку не участвуют в розыгрыше: " + ", ".join(banned))
+
     results = []
     for tag, member in clan.members.items():
         role = member.role
         cw_result = cw_manager.get_member_clan_war_result(tag)
-        if role != "leader" and role != "coLeader" and not cw_result.day_1_skips() and not cw_result.day_2_skips():
+        if role not in ["leader", "coLeader"] and not cw_result.day_1_skips() and not cw_result.day_2_skips():
             results.append(cw_result)
+
     for result in sorted(results):
         print(result)

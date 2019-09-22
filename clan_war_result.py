@@ -57,9 +57,16 @@ class ClanWarResult:
                 battles += participation.day_2_battles
         return battles
 
+    def cards_collected(self):
+        cards = 0
+        for participation in self.participations:
+            if participation is not None:
+                cards += participation.cards
+        return cards
+
     def day_1_skips(self):
         for participation in self.participations:
-            if participation and (participation.day_1_battles == 1 or participation.day_1_battles == 2):
+            if participation and (participation.day_1_battles_played == 1 or participation.day_1_battles_played == 2):
                 return True
         return False
 
