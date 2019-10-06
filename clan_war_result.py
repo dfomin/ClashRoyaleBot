@@ -10,6 +10,7 @@ class ClanWarResult:
     def __str__(self):
         result = self.name + " "
         result += str(round(self.win_rate() * 100)) + "% "
+        # result += str(self.cards_collected()) + " "
         for participation in self.participations:
             if participation is not None:
                 result += str(participation)
@@ -18,10 +19,18 @@ class ClanWarResult:
         return result
 
     def __lt__(self, other):
-        if self.win_rate() > other.win_rate():
+        if self.wins() > other.wins():
             return True
-        elif self.win_rate() < other.win_rate():
+        elif self.wins() < other.wins():
             return False
+        # if self.win_rate() > other.win_rate():
+        #     return True
+        # elif self.win_rate() < other.win_rate():
+        #     return False
+        # if self.cards_collected() > other.cards_collected():
+        #     return True
+        # if self.cards_collected() < other.cards_collected():
+        #     return False
         elif self.battles() > other.battles():
             return True
         elif self.battles() < other.battles():

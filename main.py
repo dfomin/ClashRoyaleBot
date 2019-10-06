@@ -739,6 +739,7 @@ from clan_war_manager import ClanWarManager
 from file_clan_war_storage import FileClanWarStorage
 from clan import Clan
 from pathlib import Path
+from selector import Selector
 
 if __name__ == "__main__":
     #main()
@@ -768,8 +769,15 @@ if __name__ == "__main__":
     for tag, member in clan.members.items():
         role = member.role
         cw_result = cw_manager.get_member_clan_war_result(tag)
-        if role not in ["leader", "coLeader"] and not cw_result.day_1_skips() and not cw_result.day_2_skips():
+        if role not in ["leader", "coLeader"] and not cw_result.day_1_skips() and not cw_result.day_2_skips() and cw_result.wins() > 8 or member.name == "Exclusive":
             results.append(cw_result)
 
-    for result in sorted(results):
+    results = sorted(results)
+    results = results[1:-1]
+    for result in results:
         print(result)
+
+    selector = Selector(results, 9)
+    winner = selector.select(1, verbose=True)[0]
+    print()
+    print("Победитель: " + winner)
