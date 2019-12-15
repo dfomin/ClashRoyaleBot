@@ -21,4 +21,4 @@ class Selector:
 
         names = [x[0] for x in self.names_probs]
         probs = [x[1] for x in self.names_probs]
-        return np.random.choice(names, size=count, p=probs)
+        return np.random.choice(names, size=count, replace=False, p=probs)

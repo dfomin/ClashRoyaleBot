@@ -745,8 +745,11 @@ if __name__ == "__main__":
     #main()
 
     storage = FileClanWarStorage(Path("/Users/dfomin/Downloads/cw/"))
-    clan_wars_info = list(filter(lambda x: x.date > "20190902T130358.000Z", storage.get_clan_wars()))
+    # clan_wars_info = list(filter(lambda x: x.date > "20191104T130358.000Z", storage.get_clan_wars()))
+    clan_wars_info = storage.get_clan_wars()
     clan_wars = {x.date: x for x in clan_wars_info}
+
+    print(len(clan_wars_info))
 
     server_manager = ServerManager()
     clan = server_manager.get_clan_info("#2UJ2GJ")
@@ -755,29 +758,29 @@ if __name__ == "__main__":
 
     cw_manager = ClanWarManager(clan)
 
-    leaders = list(map(lambda x: x.name, filter(lambda x: x.role in ['leader', 'coLeader'], clan.members.values())))
-    print("Соруки и лидер не участвуют в розыгрыше: " + ", ".join(leaders))
+    # leaders = list(map(lambda x: x.name, filter(lambda x: x.role in ['leader', 'coLeader'], clan.members.values())))
+    # print("Соруки и лидер не участвуют в розыгрыше: " + ", ".join(leaders))
+    #
+    # banned = []
+    # for tag, member in clan.members.items():
+    #     cw_result = cw_manager.get_member_clan_war_result(tag)
+    #     if cw_result.day_1_skips() or cw_result.day_2_skips():
+    #         banned.append(cw_result.name)
+    # print("Не доигравшие сбор или пропустившие финальную атаку не участвуют в розыгрыше: " + ", ".join(banned))
 
-    banned = []
-    for tag, member in clan.members.items():
-        cw_result = cw_manager.get_member_clan_war_result(tag)
-        if cw_result.day_1_skips() or cw_result.day_2_skips():
-            banned.append(cw_result.name)
-    print("Не доигравшие сбор или пропустившие финальную атаку не участвуют в розыгрыше: " + ", ".join(banned))
-
+    winners = []
     results = []
     for tag, member in clan.members.items():
         role = member.role
         cw_result = cw_manager.get_member_clan_war_result(tag)
-        if role not in ["leader", "coLeader"] and not cw_result.day_1_skips() and not cw_result.day_2_skips() and cw_result.wins() > 8 or member.name == "Exclusive":
-            results.append(cw_result)
+        #if role not in ["leader", "coLeader"] and not cw_result.day_1_skips() and not cw_result.day_2_skips() and cw_result.name not in winners:
+        results.append(cw_result)
 
     results = sorted(results)
-    results = results[1:-1]
     for result in results:
         print(result)
 
-    selector = Selector(results, 9)
-    winner = selector.select(1, verbose=True)[0]
-    print()
-    print("Победитель: " + winner)
+    # selector = Selector(results, 7)
+    # winner = selector.select(1, verbose=True)
+    # print()
+    # print("Победитель: " + ", ".join(winner))
