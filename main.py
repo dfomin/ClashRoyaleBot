@@ -778,7 +778,6 @@ if __name__ == "__main__":
     # for result in results:
     #     print(result)
 
-    print()
     for result in cw_manager.get_clan_war_result_history():
         print(result)
 
