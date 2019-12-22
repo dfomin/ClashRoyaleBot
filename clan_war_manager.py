@@ -13,6 +13,15 @@ class ClanWarManager:
             results.append(self.get_member_clan_war_result(tag))
         return list(map(str, sorted(results)))
 
+    def get_clan_war_result_history(self) -> list:
+        results = []
+        members_tags = set()
+        for dict_keys in map(lambda x: x.participations.keys(), self.clan.clan_wars.values()):
+            members_tags.update(dict_keys)
+        for tag in members_tags:
+            results.append(self.get_member_clan_war_result(tag))
+        return list(map(str, sorted(results)))
+
     def get_member_clan_war_result(self, tag: str) -> ClanWarResult:
         result = []
         dates = sorted(self.clan.clan_wars.keys())
@@ -22,4 +31,5 @@ class ClanWarManager:
                 result.append(clan_war.participations[tag])
             else:
                 result.append(None)
-        return ClanWarResult(tag, self.clan.members[tag].name, result)
+        name = self.clan.members[tag].name if tag in self.clan.members else tag
+        return ClanWarResult(tag, name, result)

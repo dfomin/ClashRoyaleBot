@@ -766,16 +766,20 @@ if __name__ == "__main__":
     #         banned.append(cw_result.name)
     # print("Не доигравшие сбор или пропустившие финальную атаку не участвуют в розыгрыше: " + ", ".join(banned))
 
-    winners = []
-    results = []
-    for tag, member in clan.members.items():
-        role = member.role
-        cw_result = cw_manager.get_member_clan_war_result(tag)
-        #if role not in ["leader", "coLeader"] and not cw_result.day_1_skips() and not cw_result.day_2_skips() and cw_result.name not in winners:
-        results.append(cw_result)
+    # winners = []
+    # results = []
+    # for tag, member in clan.members.items():
+    #     role = member.role
+    #     cw_result = cw_manager.get_member_clan_war_result(tag)
+    #     # if role not in ["leader", "coLeader"] and not cw_result.day_1_skips() and not cw_result.day_2_skips() and cw_result.name not in winners:
+    #     results.append(cw_result)
 
-    results = sorted(results)
-    for result in results:
+    # results = sorted(results)
+    # for result in results:
+    #     print(result)
+
+    print()
+    for result in cw_manager.get_clan_war_result_history():
         print(result)
 
     # selector = Selector(results, 7)

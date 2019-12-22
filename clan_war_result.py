@@ -12,11 +12,11 @@ class ClanWarResult:
         result += str(round(self.win_rate() * 100)) + "% "
         result += str(self.wins()) + " "
         # result += str(self.cards_collected()) + " "
-        # for participation in self.participations:
-        #     if participation is not None:
-        #         result += str(participation)
-        #     else:
-        #         result += Presenter.absense()
+        for participation in self.participations:
+            if participation is not None:
+                result += str(participation)
+            else:
+                result += Presenter.absense()
         return result
 
     def __lt__(self, other):
