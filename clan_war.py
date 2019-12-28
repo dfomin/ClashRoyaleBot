@@ -1,4 +1,5 @@
 from participation import Participation
+from standing import Standing
 
 
 class ClanWar:
@@ -9,6 +10,10 @@ class ClanWar:
         for participant in json["participants"]:
             participation = Participation(participant)
             self.participations[participation.tag] = participation
+
+        self.standings = []
+        for standing in json["standings"]:
+            self.standings.append(Standing(standing["clan"]))
 
     def __eq__(self, other):
         # TODO: check standing as well, two different clan wars could have the same date but different clans

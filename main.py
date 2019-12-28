@@ -778,7 +778,7 @@ if __name__ == "__main__":
     # for result in results:
     #     print(result)
 
-    for result in cw_manager.get_clan_war_result_history():
+    for result in cw_manager.get_war_results():
         print(result)
 
     # selector = Selector(results, 7)

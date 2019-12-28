@@ -1,5 +1,6 @@
 from clan_war_result import ClanWarResult
 from clan import Clan
+from war_result import WarResult
 
 
 class ClanWarManager:
@@ -33,3 +34,9 @@ class ClanWarManager:
                 result.append(None)
         name = self.clan.members[tag].name if tag in self.clan.members else tag
         return ClanWarResult(tag, name, result)
+
+    def get_war_results(self):
+        results = []
+        for clan_war in self.clan.clan_wars.values():
+            results.append(WarResult(self.clan.tag, clan_war))
+        return results
