@@ -4,6 +4,7 @@ from private import royaleToken
 
 
 class ServerManager:
+    @staticmethod
     def get_clan_info(self, tag: str) -> Clan:
         tag = tag.replace("#", "")
 

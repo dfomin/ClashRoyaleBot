@@ -743,11 +743,9 @@ if __name__ == "__main__":
     #main()
 
     storage = FileClanWarStorage(Path("/Users/dfomin/Downloads/cw/"))
-    # clan_wars_info = list(filter(lambda x: x.date > "20191104T130358.000Z", storage.get_clan_wars()))
+    # clan_wars_info = list(filter(lambda x: x.date > "20200203T130358.000Z", storage.get_clan_wars()))
     clan_wars_info = storage.get_clan_wars()
     clan_wars = {x.date: x for x in clan_wars_info}
-
-    print(len(clan_wars_info))
 
     server_manager = ServerManager()
     clan = server_manager.get_clan_info("#2UJ2GJ")
@@ -766,20 +764,23 @@ if __name__ == "__main__":
     #         banned.append(cw_result.name)
     # print("Не доигравшие сбор или пропустившие финальную атаку не участвуют в розыгрыше: " + ", ".join(banned))
 
-    # winners = []
-    # results = []
-    # for tag, member in clan.members.items():
-    #     role = member.role
-    #     cw_result = cw_manager.get_member_clan_war_result(tag)
-    #     # if role not in ["leader", "coLeader"] and not cw_result.day_1_skips() and not cw_result.day_2_skips() and cw_result.name not in winners:
-    #     results.append(cw_result)
+    winners = []
+    results = []
+    for tag, member in clan.members.items():
+        role = member.role
+        cw_result = cw_manager.get_member_clan_war_result(tag)
+        # if role not in ["leader", "coLeader"] and not cw_result.day_1_skips() and not cw_result.day_2_skips() and cw_result.name not in winners:
+        results.append(cw_result)
 
-    # results = sorted(results)
-    # for result in results:
-    #     print(result)
-
-    for result in cw_manager.get_war_results():
+    results = sorted(results)
+    for result in results:
         print(result)
+
+    # places = defaultdict(int)
+    # for result in cw_manager.get_war_results():
+    #     places[result.place] += 1
+    #
+    # print(places)
 
     # selector = Selector(results, 7)
     # winner = selector.select(1, verbose=True)
